@@ -1,7 +1,12 @@
+const { default: axios } = require("axios");
+const { result } = require("lodash");
+
 // Données de départ (Paris)
 var lat = 48.852969;
 var lon = 2.349903;
 var macarte = null;
+var ville = "";
+
 
 function initMap() {
     macarte = L.map('map').setView([lat, lon], 11);
@@ -68,12 +73,11 @@ window.onload = function() {
            */
 
 
-
-
 const searchInput = document.getElementById('search');
 const resultList = document.getElementById('result-list');
 const mapContainer = document.getElementById('map');
 const currentMarkers = [];
+
 
 
 searchInput.addEventListener('input', (e) => {
@@ -85,6 +89,7 @@ searchInput.addEventListener('input', (e) => {
         });
 });
 
+
 function setResultList(parsedResult) {
     resultList.innerHTML = "";
     for (const marker of currentMarkers) {
@@ -92,24 +97,75 @@ function setResultList(parsedResult) {
     }
     macarte.flyTo(new L.LatLng(20.13847, 1.40625), 2);
     for (const result of parsedResult) {
-        const li = document.createElement('li');
-        li.classList.add('list-group-item', 'list-group-item-action');
-        li.innerHTML = JSON.stringify({
+        const button = document.createElement('button');
+        button.classList.add('list-group-item', 'list-group-item-action');
+        button.innerHTML = JSON.stringify({
             displayName: result.display_name,
             lat: result.lat,
             lon: result.lon
         }, undefined, 2);
-        li.addEventListener('click', (event) => {
+
+
+        button.addEventListener('click', (event) => {
             for (const child of resultList.children) {
                 child.classList.remove('active');
             }
             event.target.classList.add('active');
             const clickedData = JSON.parse(event.target.innerHTML);
+            ville = clickedData.displayName.split(',')[0].toString();
             const position = new L.LatLng(clickedData.lat, clickedData.lon);
             macarte.flyTo(position, 10);
         })
         const position = new L.LatLng(result.lat, result.lon);
         currentMarkers.push(new L.marker(position).addTo(macarte));
-        resultList.appendChild(li);
+        resultList.appendChild(button);
     }
+
 }
+
+
+const checkMuseum = document.getElementById('Museum');
+
+checkMuseum.addEventListener('click', () => {
+        if (checkMuseum.checked == true) {
+            document.getElementById('result-list').innerHTML = '';
+
+            axios.get("http://localhost/api/museums/" + ville)
+                .then((response) => {
+                    console.log(response)
+
+                    for (const result in response) {
+                        const button = document.createElement('button');
+                        button.classList.add('list-group-item', 'list-group-item-action');
+                        button.innerHTML = JSON.stringify({
+                            result: result.label,
+                            lat: result.x,
+                            lon: result.y
+                        }, undefined, 2);
+                    }
+                })
+        }
+    })
+    /*
+    checkMuseum.addEventListener('click', () => {
+        if (checkMuseum.checked == true) {
+
+            document.getElementById('result-list').innerHTML = '';
+
+            axios.get("http://localhost/api/museums/" + ville)
+                .then(result => result.json())
+                .then(parsedResult => {
+                    setResultList(parsedResult);
+
+                    console.log(parsedResult)
+                    for (const response of parsedResult) {
+                        const button = document.createElement('button');
+                        button.classList.add('list-group-item', 'list-group-item-action');
+                        button.innerHTML = JSON.stringify({
+                            label: response.label
+                        }, undefined, 2);
+                    }
+                })
+        }
+    })
+    */
