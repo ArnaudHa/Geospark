@@ -2101,7 +2101,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*!*********************************!*\
   !*** ./resources/js/testclo.js ***!
   \*********************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -2109,10 +2109,17 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-// Données de départ (Paris)
+var _require = __webpack_require__(/*! axios */ "./node_modules/axios/index.js"),
+    axios = _require["default"];
+
+var _require2 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"),
+    result = _require2.result; // Données de départ (Paris)
+
+
 var lat = 48.852969;
 var lon = 2.349903;
 var macarte = null;
+var ville = "";
 
 function initMap() {
   macarte = L.map('map').setView([lat, lon], 11); // Récupération des données sur openstreetmap
@@ -2214,15 +2221,15 @@ function setResultList(parsedResult) {
 
   try {
     for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var result = _step2.value;
-      var li = document.createElement('li');
-      li.classList.add('list-group-item', 'list-group-item-action');
-      li.innerHTML = JSON.stringify({
-        displayName: result.display_name,
-        lat: result.lat,
-        lon: result.lon
+      var _result = _step2.value;
+      var button = document.createElement('button');
+      button.classList.add('list-group-item', 'list-group-item-action');
+      button.innerHTML = JSON.stringify({
+        displayName: _result.display_name,
+        lat: _result.lat,
+        lon: _result.lon
       }, undefined, 2);
-      li.addEventListener('click', function (event) {
+      button.addEventListener('click', function (event) {
         var _iterator3 = _createForOfIteratorHelper(resultList.children),
             _step3;
 
@@ -2239,12 +2246,13 @@ function setResultList(parsedResult) {
 
         event.target.classList.add('active');
         var clickedData = JSON.parse(event.target.innerHTML);
+        ville = clickedData.displayName.split(',')[0].toString();
         var position = new L.LatLng(clickedData.lat, clickedData.lon);
         macarte.flyTo(position, 10);
       });
-      var position = new L.LatLng(result.lat, result.lon);
+      var position = new L.LatLng(_result.lat, _result.lon);
       currentMarkers.push(new L.marker(position).addTo(macarte));
-      resultList.appendChild(li);
+      resultList.appendChild(button);
     }
   } catch (err) {
     _iterator2.e(err);
@@ -2252,6 +2260,46 @@ function setResultList(parsedResult) {
     _iterator2.f();
   }
 }
+
+var checkMuseum = document.getElementById('Museum');
+checkMuseum.addEventListener('click', function () {
+  if (checkMuseum.checked == true) {
+    document.getElementById('result-list').innerHTML = '';
+    axios.get("http://localhost/api/museums/" + ville).then(function (response) {
+      console.log(response);
+
+      for (var _result2 in response) {
+        var button = document.createElement('button');
+        button.classList.add('list-group-item', 'list-group-item-action');
+        button.innerHTML = JSON.stringify({
+          result: _result2.label,
+          lat: _result2.x,
+          lon: _result2.y
+        }, undefined, 2);
+      }
+    });
+  }
+});
+/*
+checkMuseum.addEventListener('click', () => {
+    if (checkMuseum.checked == true) {
+          document.getElementById('result-list').innerHTML = '';
+          axios.get("http://localhost/api/museums/" + ville)
+            .then(result => result.json())
+            .then(parsedResult => {
+                setResultList(parsedResult);
+                  console.log(parsedResult)
+                for (const response of parsedResult) {
+                    const button = document.createElement('button');
+                    button.classList.add('list-group-item', 'list-group-item-action');
+                    button.innerHTML = JSON.stringify({
+                        label: response.label
+                    }, undefined, 2);
+                }
+            })
+    }
+})
+*/
 
 /***/ }),
 
