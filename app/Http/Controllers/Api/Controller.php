@@ -55,23 +55,32 @@ class Controller extends BaseController
     {
         $client = new HttpClient();
         Http::setDefaultHttpClient($client);
-
         $clientSPARQL = new Client("https://query.wikidata.org/sparql");
         return $clientSPARQL->query($query);
     }
 
     public function getResId($city)
     {
-        $client = new \GuzzleHttp\Client();
         $response = \Illuminate\Support\Facades\Http::get('https://fr.wikipedia.org/w/api.php?action=query&prop=pageprops&titles='.$city.'&format=json');
         $pages = $response->json()['query']['pages'];
-        return $pages[array_key_first($pages)]['pageprops']['wikibase_item'];
+
+        if(count($pages) !== 0) {
+            return $pages[array_key_first($pages)]['pageprops']['wikibase_item'];
+        }
+
+        return null;
     }
 
     public function getMuseums(Request $request, $city)
     {
         //$city = 'wd:Q6602';
         $cityId = $this->getResId($city);
+
+        if($cityId === null) {
+            return response()->json([
+                'error' => 'City not found'
+            ])->status(404);
+        }
 
         $query = 'SELECT ?item ?itemLabel ?coordinates ?picture
                 WHERE
