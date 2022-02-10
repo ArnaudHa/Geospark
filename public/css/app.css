@@ -18,7 +18,8 @@
     text-anchor: middle;
     -webkit-user-select: none;
     -moz-user-select: none;
-    user-select: none;
+    -ms-user-select: none;
+        user-select: none;
 }
 
 @media (min-width: 768px) {
@@ -2147,6 +2148,11 @@ progress {
     opacity: 1
 }
 
+.form-control:-ms-input-placeholder {
+    color: #6c757d;
+    opacity: 1
+}
+
 .form-control::placeholder {
     color: #6c757d;
     opacity: 1
@@ -2672,11 +2678,20 @@ textarea.form-control-lg {
     color: transparent
 }
 
+.form-floating>.form-control:-ms-input-placeholder {
+    color: transparent
+}
+
 .form-floating>.form-control::placeholder {
     color: transparent
 }
 
 .form-floating>.form-control:not(:-moz-placeholder-shown) {
+    padding-top: 1.625rem;
+    padding-bottom: .625rem
+}
+
+.form-floating>.form-control:not(:-ms-input-placeholder) {
     padding-top: 1.625rem;
     padding-bottom: .625rem
 }
@@ -2698,6 +2713,11 @@ textarea.form-control-lg {
 }
 
 .form-floating>.form-control:not(:-moz-placeholder-shown)~label {
+    opacity: .65;
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem)
+}
+
+.form-floating>.form-control:not(:-ms-input-placeholder)~label {
     opacity: .65;
     transform: scale(.85) translateY(-.5rem) translateX(.15rem)
 }
@@ -3031,7 +3051,8 @@ textarea.form-control.is-invalid {
     cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
-    user-select: none;
+    -ms-user-select: none;
+        user-select: none;
     background-color: transparent;
     border: 1px solid transparent;
     padding: .375rem .75rem;
@@ -5904,7 +5925,8 @@ fieldset:disabled .btn {
     pointer-events: none;
     -webkit-user-select: none;
     -moz-user-select: none;
-    user-select: none;
+    -ms-user-select: none;
+        user-select: none;
     opacity: .25
 }
 
@@ -8492,13 +8514,15 @@ fieldset:disabled .btn {
 .user-select-auto {
     -webkit-user-select: auto !important;
     -moz-user-select: auto !important;
-    user-select: auto !important
+    -ms-user-select: auto !important;
+        user-select: auto !important
 }
 
 .user-select-none {
     -webkit-user-select: none !important;
     -moz-user-select: none !important;
-    user-select: none !important
+    -ms-user-select: none !important;
+        user-select: none !important
 }
 
 .pe-none {
@@ -11097,6 +11121,3 @@ fieldset:disabled .btn {
         display: none !important
     }
 }
-
-
-/*# sourceMappingURL=bootstrap.min.css.map */
