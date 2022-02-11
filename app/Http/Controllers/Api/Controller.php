@@ -155,12 +155,18 @@ class Controller extends BaseController
 
         foreach ($layers as $layer) {
             $layersToQuery .= ' ' . implode(' ', $referenceLayers[$layer]['classes']);
-            $layersToQueryFilter .= implode(',', $referenceLayers[$layer]['classes']);
+            //$layersToQueryFilter .= ' ' . implode(" , ", $referenceLayers[$layer]['classes']);
+
+            // implode a decidé de plus fonctionner
+            foreach ($referenceLayers[$layer]['classes'] as $elem) {
+                $layersToQueryFilter .= $elem . ',';
+            }
         }
 
         $layersToQuery .= ' }';
         $layersToQueryFilter .= ')';
 
+        $layersToQueryFilter = str_replace(',)', ')', $layersToQueryFilter);
 
 
         $query = 'SELECT ?type ?item ?itemLabel ?coordinates ?picture
@@ -180,7 +186,6 @@ class Controller extends BaseController
 
                   SERVICE wikibase:label { bd:serviceParam wikibase:language "fr" }
                 } LIMIT ' . count($layers) * 150;
-
 
         $results = $this->req($query);
 

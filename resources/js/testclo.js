@@ -122,7 +122,7 @@ let setMuseumsList = (museums) => {
 
         const position = new L.LatLng(museum.coordinates.y, museum.coordinates.x);
 
-        currentMarkers.push(new L.marker(position).addTo(map));
+        currentMarkers.push(new L.marker(position).addTo(map).bindPopup("<div>" + museum.label + "</div>" + "<img heigth='200px' width='200px' src=\'" + museum.picture + "\'/>"));
 
         button.innerHTML = '<i class="fa-solid '+ museum.icon +' mr-2"></i>' + museum.label;
         resultList.appendChild(button);
@@ -192,6 +192,7 @@ let onMapClick = (e) => {
 
 
 
+
 /**************************/
 // LISTENERS
 /**************************/
@@ -208,13 +209,5 @@ searchInput.addEventListener('input', (e) => {
 document.getElementById('go-back').onclick = function(e) {
     e.target.setAttribute('hidden', true);
     searchCity();
+
 };
-/*===================================================
-                    OSM  LAYER
-===================================================*/
-/*
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    osm.addTo(macarte);
-*/
