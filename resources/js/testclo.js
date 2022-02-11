@@ -108,10 +108,7 @@ let setMuseumsList = (museums) => {
 
         const position = new L.LatLng(museum.coordinates.y, museum.coordinates.x);
 
-        currentMarkers.push(new L.marker(position).addTo(map).bindPopup("<div>" + museum.label + "</div>" + "<img heigth='200px' width='200px' src=\'" + museum.picture + "\'/>", {
-            width: "20px",
-            heigth: "20px"
-        }));
+        currentMarkers.push(new L.marker(position).addTo(map).bindPopup("<div>" + museum.label + "</div>" + "<img heigth='200px' width='200px' src=\'" + museum.picture + "\'/>"));
 
         button.innerHTML = museum.label;
         resultList.appendChild(button);
