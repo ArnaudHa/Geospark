@@ -47,8 +47,8 @@ let setResultList = (parsedResult) => {
 
     map.flyTo(new L.LatLng(20.13847, 1.40625), 2);
 
-    for(let key in parsedResult) {
-        if(!parsedResult.hasOwnProperty(key))
+    for (let key in parsedResult) {
+        if (!parsedResult.hasOwnProperty(key))
             continue;
 
         const result = parsedResult[key];
@@ -72,7 +72,7 @@ let setResultList = (parsedResult) => {
 let searchCity = () => {
     const query = searchInput.value;
 
-    if(query.length < 3 || searchRequestPending)
+    if (query.length < 3 || searchRequestPending)
         return;
 
     searchRequestPending = true;
@@ -87,15 +87,18 @@ let searchCity = () => {
             setResultList(response.data.items);
         }).finally(() => {
             searchRequestPending = false;
-            if(searchCurrentTerm !== searchInput.value)
+            if (searchCurrentTerm !== searchInput.value)
                 searchCity();
         });
 }
 
 let setMuseumsList = (museums) => {
+    for (const marker of currentMarkers) {
+        map.removeLayer(marker);
+    }
 
-    for(let key in museums) {
-        if(!museums.hasOwnProperty(key))
+    for (let key in museums) {
+        if (!museums.hasOwnProperty(key))
             continue;
 
         let museum = museums[key];
@@ -105,18 +108,13 @@ let setMuseumsList = (museums) => {
 
         const position = new L.LatLng(museum.coordinates.y, museum.coordinates.x);
 
-        new L.marker(position)
-            .addTo(map)
+        currentMarkers.push(new L.marker(position).addTo(map));
 
-        button.innerHTML = JSON.stringify({
-            result: museum.label,
-            lat: museum.coordinates.x,
-            lon: museum.coordinates.y
-        }, undefined, 2);
-
+        button.innerHTML = museum.label;
         resultList.appendChild(button);
     }
 }
+
 
 let getMuseums = () => {
     if (checkMuseum.checked === true) {
@@ -132,7 +130,7 @@ let getMuseums = () => {
 let onMapClick = (e) => {
     popup
         .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
+        .setContent("Coordonnées : " + e.latlng.toString())
         .openOn(map);
 }
 
@@ -154,13 +152,9 @@ checkMuseum.addEventListener('click', () => {
     getMuseums();
 })
 
-
-
-
-
-
-
-
+document.getElementById('go-back').onclick = function(e) {
+    searchCity();
+};
 /*===================================================
                     OSM  LAYER
 ===================================================*/
@@ -169,27 +163,4 @@ checkMuseum.addEventListener('click', () => {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     osm.addTo(macarte);
-*/
-/*
-checkMuseum.addEventListener('click', () => {
-    if (checkMuseum.checked == true) {
-
-        document.getElementById('result-list').innerHTML = '';
-
-        axios.get("http://localhost/api/museums/" + ville)
-            .then(result => result.json())
-            .then(parsedResult => {
-                setResultList(parsedResult);
-
-                console.log(parsedResult)
-                for (const response of parsedResult) {
-                    const button = document.createElement('button');
-                    button.classList.add('list-group-item', 'list-group-item-action');
-                    button.innerHTML = JSON.stringify({
-                        label: response.label
-                    }, undefined, 2);
-                }
-            })
-    }
-})
 */
