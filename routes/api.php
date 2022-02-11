@@ -18,8 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('types', [ \App\Http\Controllers\Api\Controller::class, 'getTypes' ]);
+Route::get('layers', [ \App\Http\Controllers\Api\Controller::class, 'getLayers' ]);
 
-Route::get('museums/{city}', [ \App\Http\Controllers\Api\Controller::class, 'getMuseums' ]);
+Route::get('search/city/{term}', [ \App\Http\Controllers\Api\Controller::class, 'searchCity' ]);
 
-Route::get('search/{term}', [ \App\Http\Controllers\Api\Controller::class, 'search' ]);
+Route::get('search/poi/{city}', [ \App\Http\Controllers\Api\Controller::class, 'searchPoi' ]);

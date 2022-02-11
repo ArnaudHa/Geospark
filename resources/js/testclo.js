@@ -82,7 +82,7 @@ let searchCity = () => {
         '  <span class="visually-hidden">Loading...</span>\n' +
         '</div>';
 
-    axios.get('/api/search/' + query)
+    axios.get('/api/search/city/' + query)
         .then(response => {
             setResultList(response.data.items);
         }).finally(() => {
