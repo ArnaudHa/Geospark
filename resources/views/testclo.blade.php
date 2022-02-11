@@ -17,11 +17,13 @@
     <header class="py-3 mb-3 border-bottom">
         <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr;">
 
-            <div class="geospark"> GEOSPARK</div>
+        
+        <div class="geospark">GE<i class="fa-solid fa-book-atlas"></i>SPARK</div>
 
             <div class="d-flex align-items-center">
                 <div class="input-group">
-                    <span class="input-group-text">Rechercher =></span>
+                    <span class="input-group-text">Rechercher &nbsp&nbsp<i class="fa-solid fa-magnifying-glass-location"></i></span>
+                    
                     <input id="search" type="text" class="form-control" placeholder="Rechercher une ville...">
                 </div>
             </div>
@@ -40,29 +42,21 @@
                     <div class="card-body">
                         <div style="grid-template-columns: 1fr 2fr;">
                             <label for="Accept">
-                                <input type="checkbox" id="Museum" name="Accept" value="yes"> Museum
+                                <i class="fa-solid fa-building-columns fa-2x"></i>&nbsp
+                                <input type="checkbox" id="Museum" name="Accept" value="yes"> Musées
                             </label>
                         </div>
                     </div>
                 </div>
 
                 <div class="card mb-2">
-                    <div class="card-header">
-                        Résultats recherche
+                    <div class="card-header" >
+                    <i class="fa-solid fa-left-long" id="go-back"></i> &nbsp Resultats recherche
                     </div>
                     <div class="card-body">
                         <div id="result-list" class="list-group">
                             Veuillez lancer la recherche...
                         </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        Résultats recherche
-                    </div>
-                    <div class="card-body">
-                        <div id="city-result"></div>
                     </div>
                 </div>
 
@@ -76,6 +70,7 @@
 
 </main>
 
+<script src="https://kit.fontawesome.com/a1a0b6aaec.js" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>

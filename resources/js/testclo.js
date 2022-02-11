@@ -47,8 +47,8 @@ let setResultList = (parsedResult) => {
 
     map.flyTo(new L.LatLng(20.13847, 1.40625), 2);
 
-    for(let key in parsedResult) {
-        if(!parsedResult.hasOwnProperty(key))
+    for (let key in parsedResult) {
+        if (!parsedResult.hasOwnProperty(key))
             continue;
 
         const result = parsedResult[key];
@@ -72,7 +72,7 @@ let setResultList = (parsedResult) => {
 let searchCity = () => {
     const query = searchInput.value;
 
-    if(query.length < 3 || searchRequestPending)
+    if (query.length < 3 || searchRequestPending)
         return;
 
     searchRequestPending = true;
@@ -87,15 +87,15 @@ let searchCity = () => {
             setResultList(response.data.items);
         }).finally(() => {
             searchRequestPending = false;
-            if(searchCurrentTerm !== searchInput.value)
+            if (searchCurrentTerm !== searchInput.value)
                 searchCity();
         });
 }
 
 let setMuseumsList = (museums) => {
 
-    for(let key in museums) {
-        if(!museums.hasOwnProperty(key))
+    for (let key in museums) {
+        if (!museums.hasOwnProperty(key))
             continue;
 
         let museum = museums[key];
@@ -107,16 +107,11 @@ let setMuseumsList = (museums) => {
 
         new L.marker(position)
             .addTo(map)
-
-        button.innerHTML = JSON.stringify({
-            result: museum.label,
-            lat: museum.coordinates.x,
-            lon: museum.coordinates.y
-        }, undefined, 2);
-
+        button.innerHTML = museum.label;
         resultList.appendChild(button);
     }
 }
+
 
 let getMuseums = () => {
     if (checkMuseum.checked === true) {
@@ -155,12 +150,45 @@ checkMuseum.addEventListener('click', () => {
 })
 
 
+function JSONstringify(json) {
+    if (typeof json != 'string') {
+        json = JSON.stringify(json, undefined, '\t');
+    }
 
+    var
+        arr = [],
+        _string = 'color:green',
+        _number = 'color:darkorange',
+        _boolean = 'color:blue',
+        _null = 'color:magenta',
+        _key = 'color:red';
 
+    json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+        var style = _number;
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                style = _key;
+            } else {
+                style = _string;
+            }
+        } else if (/true|false/.test(match)) {
+            style = _boolean;
+        } else if (/null/.test(match)) {
+            style = _null;
+        }
+        arr.push(style);
+        arr.push('');
+        return '%c' + match + '%c';
+    });
 
+    arr.unshift(json);
 
+    console.log.apply(console, arr);
+}
 
-
+document.getElementById('go-back').onclick = function(e) {
+    searchCity();
+};
 /*===================================================
                     OSM  LAYER
 ===================================================*/
@@ -169,27 +197,4 @@ checkMuseum.addEventListener('click', () => {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     osm.addTo(macarte);
-*/
-/*
-checkMuseum.addEventListener('click', () => {
-    if (checkMuseum.checked == true) {
-
-        document.getElementById('result-list').innerHTML = '';
-
-        axios.get("http://localhost/api/museums/" + ville)
-            .then(result => result.json())
-            .then(parsedResult => {
-                setResultList(parsedResult);
-
-                console.log(parsedResult)
-                for (const response of parsedResult) {
-                    const button = document.createElement('button');
-                    button.classList.add('list-group-item', 'list-group-item-action');
-                    button.innerHTML = JSON.stringify({
-                        label: response.label
-                    }, undefined, 2);
-                }
-            })
-    }
-})
 */
