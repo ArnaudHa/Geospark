@@ -17,13 +17,13 @@
     <header class="py-3 mb-3 border-bottom">
         <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr;">
 
-        
+
         <div class="geospark">GE<i class="fa-solid fa-book-atlas"></i>SPARK</div>
 
             <div class="d-flex align-items-center">
                 <div class="input-group">
                     <span class="input-group-text">Rechercher &nbsp&nbsp<i class="fa-solid fa-magnifying-glass-location"></i></span>
-                    
+
                     <input id="search" type="text" class="form-control" placeholder="Rechercher une ville...">
                 </div>
             </div>
@@ -37,23 +37,23 @@
 
                 <div class="card mb-2">
                     <div class="card-header">
-                        Filtres
+                        Elements à afficher
                     </div>
-                    <div class="card-body">
-                        <div style="grid-template-columns: 1fr 2fr;">
-                            <label for="Accept">
-                                <i class="fa-solid fa-building-columns fa-2x"></i>&nbsp
-                                <input type="checkbox" id="Museum" name="Accept" value="yes"> Musées
-                            </label>
+                    <div id="layers-list" class="card-body">
+                        <div class="spinner-grow" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="card mb-2">
                     <div class="card-header" >
-                    <i class="fa-solid fa-left-long" id="go-back"></i> &nbsp Resultats recherche
+                         Résultats recherche
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="max-height: 500px; overflow-y: scroll;">
+                        <button id="go-back" type="button" class="btn btn-primary mb-3" hidden>
+                            <i class="fa-solid fa-left-long"></i> Retour aux villes
+                        </button>
                         <div id="result-list" class="list-group">
                             Veuillez lancer la recherche...
                         </div>

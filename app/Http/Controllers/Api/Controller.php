@@ -128,6 +128,12 @@ class Controller extends BaseController
             ]
         ];
 
+        $reverse = [
+            'Q33506' => 'fa-building-columns',
+            'Q22698' => 'fa-tree',
+            'Q4989906' => 'fa-archway',
+        ];
+
         $cityId = $this->getResId($city);
 
         if($cityId === null) {
@@ -145,14 +151,19 @@ class Controller extends BaseController
         }
 
         $layersToQuery = '{';
+        $layersToQueryFilter = '(';
 
         foreach ($layers as $layer) {
             $layersToQuery .= ' ' . implode(' ', $referenceLayers[$layer]['classes']);
+            $layersToQueryFilter .= implode(',', $referenceLayers[$layer]['classes']);
         }
 
         $layersToQuery .= ' }';
+        $layersToQueryFilter .= ')';
 
-        $query = 'SELECT ?item ?itemLabel ?coordinates ?picture
+
+
+        $query = 'SELECT ?type ?item ?itemLabel ?coordinates ?picture
                 WHERE
                 {
                   VALUES ?layers '. $layersToQuery .'
@@ -161,8 +172,15 @@ class Controller extends BaseController
                   ?item wdt:P131 wd:' . $cityId . ' .
                   ?item wdt:P625 ?coordinates .
                   ?item wdt:P18 ?picture .
+
+                  {
+                    ?item wdt:P31/wdt:P279* ?type .
+                    FILTER(?type IN '.$layersToQueryFilter.')
+                  }
+
                   SERVICE wikibase:label { bd:serviceParam wikibase:language "fr" }
                 } LIMIT ' . count($layers) * 150;
+
 
         $results = $this->req($query);
 
@@ -171,6 +189,9 @@ class Controller extends BaseController
         foreach ($results as $result) {
             $split = explode(' ', $result->coordinates->getValue());
 
+            $entityId = explode('/', $result->type->getUri());
+            $entityId = $entityId[count($entityId) - 1];
+
             $items->add([
                 'label' => Str::ucfirst($result->itemLabel->getValue()),
                 'coordinates' => [
@@ -178,6 +199,7 @@ class Controller extends BaseController
                     'y' => str_replace(')', '', $split[1]),
                 ],
                 'picture' => $result->picture->getUri(),
+                'icon' => $reverse[$entityId],
             ]);
         }
 
@@ -189,7 +211,7 @@ class Controller extends BaseController
     public function getLayers()
     {
         return response()->json([
-            'filters' => [
+            'layers' => [
                 [
                     'label' => 'museum',
                     'name' => 'Musées',

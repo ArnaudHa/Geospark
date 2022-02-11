@@ -11,13 +11,17 @@ const searchInput = document.getElementById('search');
 const resultList = document.getElementById('result-list');
 const mapContainer = document.getElementById('map');
 const currentMarkers = [];
+const currentLayers = [];
 
-const checkMuseum = document.getElementById('Museum');
+let layersSwitches = document.getElementsByClassName('layers-switch');
+const layersList = document.getElementById('layers-list');
 
 let searchRequestPending = false;
 let searchCurrentTerm = "";
 
 let popup = L.popup();
+
+const controller = new AbortController();
 
 
 
@@ -69,30 +73,40 @@ let setResultList = (parsedResult) => {
     }
 }
 
+let requestPending = false;
+
 let searchCity = () => {
     const query = searchInput.value;
 
-    if (query.length < 3 || searchRequestPending)
+    if (query.length < 3 || requestPending)
         return;
 
-    searchRequestPending = true;
+    requestPending = true;
+
     searchCurrentTerm = query;
     resultList.innerHTML = '' +
         '<div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">\n' +
         '  <span class="visually-hidden">Loading...</span>\n' +
         '</div>';
 
-    axios.get('/api/search/city/' + query)
+    axios.get('/api/search/city/' + query, {
+        signal: controller.signal,
+    })
         .then(response => {
+            if(typeof response.data.error !== 'undefined' && searchCurrentTerm === searchInput.value)
+                searchCity();
             setResultList(response.data.items);
         }).finally(() => {
-            searchRequestPending = false;
+            requestPending = false;
             if (searchCurrentTerm !== searchInput.value)
                 searchCity();
         });
 }
 
 let setMuseumsList = (museums) => {
+
+    document.getElementById('go-back').removeAttribute('hidden');
+
     for (const marker of currentMarkers) {
         map.removeLayer(marker);
     }
@@ -110,21 +124,63 @@ let setMuseumsList = (museums) => {
 
         currentMarkers.push(new L.marker(position).addTo(map));
 
-        button.innerHTML = museum.label;
+        button.innerHTML = '<i class="fa-solid '+ museum.icon +' mr-2"></i>' + museum.label;
         resultList.appendChild(button);
     }
 }
 
+let initLayersChecks = () => {
 
-let getMuseums = () => {
-    if (checkMuseum.checked === true) {
-        document.getElementById('result-list').innerHTML = '';
+    axios.get('/api/layers')
+        .then(response => {
 
-        axios.get("http://localhost/api/museums/" + ville)
-            .then((response) => {
-                setMuseumsList(response.data.items);
-            })
-    }
+            let layers = response.data.layers;
+            layersList.innerHTML = "";
+
+            for(let key in layers) {
+                if(!layers.hasOwnProperty(key))
+                    continue;
+
+                let layer = layers[key];
+
+                layersList.innerHTML += '' +
+                    '<div class="px-5">\n' +
+                    '   <div class="form-check form-switch">\n' +
+                    '      <input class="form-check-input layers-switch" data-layer="'+layer.label+'" type="checkbox" role="switch" id="layers-switch-'+layer.label+'">\n' +
+                    '      <label class="form-check-label" for="layers-switch-'+layer.label+'">\n' +
+                    '        <i class="fa-solid '+layer.icon+' ml-3 mr-2"></i> '+layer.name+'\n' +
+                    '      </label>\n' +
+                    '   </div>\n' +
+                    '</div>';
+            }
+
+            layersSwitches = document.getElementsByClassName('layers-switch');
+
+            for(let key in layersSwitches) {
+                if(!layersSwitches.hasOwnProperty(key))
+                    continue;
+
+                layersSwitches[key].addEventListener('change', (e) => {
+                    if(e.target.checked) {
+                        currentLayers.push(e.target.dataset.layer)
+                    } else {
+                        currentLayers.splice(currentLayers.indexOf(e.target.dataset.layer), 1);
+                    }
+
+                    getPoi();
+                });
+            }
+        });
+}
+
+
+let getPoi = () => {
+    document.getElementById('result-list').innerHTML = '';
+
+    axios.get("/api/search/poi/" + ville + '?layers='+currentLayers.join(','))
+        .then((response) => {
+            setMuseumsList(response.data.items);
+        });
 }
 
 let onMapClick = (e) => {
@@ -141,6 +197,7 @@ let onMapClick = (e) => {
 /**************************/
 
 initMap();
+initLayersChecks();
 
 map.on('click', onMapClick);
 
@@ -148,11 +205,8 @@ searchInput.addEventListener('input', (e) => {
     searchCity();
 });
 
-checkMuseum.addEventListener('click', () => {
-    getMuseums();
-})
-
 document.getElementById('go-back').onclick = function(e) {
+    e.target.setAttribute('hidden', true);
     searchCity();
 };
 /*===================================================
