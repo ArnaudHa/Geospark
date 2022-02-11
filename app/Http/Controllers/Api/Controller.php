@@ -113,4 +113,56 @@ class Controller extends BaseController
             'items' => $items,
         ]);
     }
+
+    public function search(Request $request, $term)
+    {
+        $query = 'SELECT DISTINCT ?item ?cityName ?cityCoordinates ?zipCode ?countryName ?cityDescription
+                    WHERE
+                    {
+
+                      ?item wdt:P31/wdt:P279* wd:Q515 ;
+                            wdt:P1448 ?cityName ;
+                            wdt:P625 ?cityCoordinates .
+
+                      OPTIONAL {
+                        ?item wdt:P17 ?country .
+                        ?country wdt:P1448 ?countryName .
+                        FILTER (LANG(?countryName) IN ("fr"))
+                      }
+
+                      OPTIONAL {
+                        ?item schema:description ?cityDescription .
+                        FILTER (LANG(?cityDescription) IN ("fr"))
+                      }
+
+                      OPTIONAL {
+                        ?item wdt:P281 ?zipCode .
+                      }
+
+                      FILTER ( REGEX(?cityName, "'.$term.'") )
+
+                    } LIMIT 20';
+
+        $results = $this->req($query);
+
+        $items = new Collection();
+
+        foreach ($results as $result) {
+            $split = explode(' ', $result->cityCoordinates->getValue());
+
+            $items->add([
+                'city' => Str::ucfirst($result->cityName->getValue()),
+                'zipCode' => $result->zipCode->getValue(),
+                'country' => $result->countryName->getValue(),
+                'coordinates' => [
+                    'x' => str_replace('Point(', '', $split[0]),
+                    'y' => str_replace(')', '', $split[1]),
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'items' => $items,
+        ]);
+    }
 }

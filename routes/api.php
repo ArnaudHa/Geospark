@@ -22,3 +22,4 @@ Route::get('types', [ \App\Http\Controllers\Api\Controller::class, 'getTypes' ])
 
 Route::get('museums/{city}', [ \App\Http\Controllers\Api\Controller::class, 'getMuseums' ]);
 
+Route::get('search/{term}', [ \App\Http\Controllers\Api\Controller::class, 'search' ]);
